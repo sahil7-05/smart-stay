@@ -1,0 +1,55 @@
+<%- include("../layouts/boilerplate") -%>
+<div class="row">
+  <div class="col-md-8 offset-md-2">
+    <h1 class="mb-4">Create New Listing</h1>
+    <form action="/listings" method="POST" enctype="multipart/form-data" novalidate>
+      <div class="row">
+        <div class="col-md-6">
+          <div class="mb-3">
+            <label for="title" class="form-label">Title</label>
+            <input type="text" class="form-control" id="title" name="listing[title]" required>
+          </div>
+          <div class="mb-3">
+            <label for="description" class="form-label">Description</label>
+            <textarea class="form-control" id="description" name="listing[description]" rows="3" required></textarea>
+          </div>
+          <div class="mb-3">
+            <label for="price" class="form-label">Price</label>
+            <input type="number" class="form-control" id="price" name="listing[price]" required>
+          </div>
+          <div class="mb-3">
+            <label for="location" class="form-label">Location</label>
+            <input type="text" class="form-control" id="location" name="listing[location]" required>
+          </div>
+          <div class="mb-3">
+            <label for="country" class="form-label">Country</label>
+            <input type="text" class="form-control" id="country" name="listing[country]" required>
+          </div>
+          <div class="mb-3">
+            <label for="type" class="form-label">Type</label>
+            <select class="form-select" id="type" name="listing[type]" required>
+              <option value="stay">Stay</option>
+              <option value="experience">Experience</option>
+              <option value="restaurant">Restaurant</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="amenities" class="form-label">Amenities</label>
+            <input type="text" class="form-control" id="amenities" name="amenities" placeholder="WiFi, Kitchen, Parking, etc.">
+          </div>
+          <div class="mb-3">
+            <label for="image" class="form-label">Image</label>
+            <input type="file" class="form-control" id="image" name="image" accept="image/*">
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="mb-3">
+            <label for="description" class="form-label">Description</label>
+            <textarea class="form-control" id="description" name="listing[description]" rows="5" required></textarea>
+          </div>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary w-100">Create Listing</button>
+    </form>
+  </div>
+</div>

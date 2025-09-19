@@ -1,0 +1,283 @@
+<%- layout("layouts/boilerplate") -%>
+<div class="row">
+  <div class="col-md-8">
+    <img src="<%= listing.image.url %>" class="img-fluid rounded mb-4" alt="<%= listing.title %>">
+    <h1><%= listing.title %></h1>
+    <p class="text-muted"><%= listing.location %>, <%= listing.country %></p>
+    
+    <!-- Rating Display -->
+    <% if (listing.averageRating && listing.averageRating > 0) { %>
+      <div class="mb-3">
+        <span class="text-warning">
+          <% for (let i = 1; i <= 5; i++) { %>
+            <span class="<%= i <= listing.averageRating ? 'text-warning' : 'text-muted' %>">★</span>
+          <% } %>
+        </span>
+        <span class="ms-2"><%= listing.averageRating %>/5 (<%= listing.totalReviews %> reviews)</span>
+      </div>
+    <% } %>
+    
+    <p><%= listing.description %></p>
+    
+    <h3>Amenities</h3>
+    <div class="mb-3">
+      <% if (listing.amenities && listing.amenities.length > 0) { %>
+        <% listing.amenities.forEach(amenity => { %>
+          <span class="badge bg-secondary amenity-badge"><%= amenity %></span>
+        <% }) %>
+      <% } else { %>
+        <p>No amenities listed</p>
+      <% } %>
+    </div>
+    
+    <div class="d-flex justify-content-between align-items-center">
+      <span class="price-tag">$<%= listing.price %>/night</span>
+      <span class="badge bg-primary"><%= listing.type %></span>
+    </div>
+
+    <!-- Interactive Map Section -->
+    <div class="mt-4">
+      <h3>Location</h3>
+      <p><i class="fas fa-map-marker-alt"></i> <%= listing.location %>, <%= listing.country %></p>
+      <div id="map" style="height: 300px; width: 100%;" class="mb-3 border rounded"></div>
+    </div>
+
+    <!-- Add Review Form (Inline) -->
+    <div class="mt-5">
+      <h3>Reviews & Ratings</h3>
+      
+      <% if (currentUser) { %>
+        <div class="card mb-4">
+          <div class="card-header">
+            <h5>Add Your Review</h5>
+          </div>
+          <div class="card-body">
+            <form action="/listings/<%= listing._id %>/reviews" method="POST" id="reviewForm">
+              <div class="mb-3">
+                <label for="rating" class="form-label">Rating (1-5)</label>
+                <div class="rating-input">
+                  <% for (let i = 1; i <= 5; i++) { %>
+                    <span class="star-rating" data-rating="<%= i %>">★</span>
+                  <% } %>
+                </div>
+                <input type="hidden" name="rating" id="rating" required>
+              </div>
+              <div class="mb-3">
+                <label for="review" class="form-label">Your Review</label>
+                <textarea class="form-control" name="review" id="review" rows="4" required 
+                  placeholder="Share your experience..."></textarea>
+              </div>
+              <button type="submit" class="btn btn-primary">Submit Review</button>
+            </form>
+          </div>
+        </div>
+      <% } else { %>
+        <div class="alert alert-info">
+          <a href="/login">Login</a> to add your review and rating.
+        </div>
+      <% } %>
+
+      <!-- Reviews Display -->
+      <div id="reviewsContainer">
+        <% if (reviews && reviews.length > 0) { %>
+          <% reviews.forEach(review => { %>
+            <div class="card mb-3">
+              <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  <h6 class="card-title mb-0"><%= review.user.name %></h6>
+                  <div class="text-warning">
+                    <% for (let i = 1; i <= 5; i++) { %>
+                      <span class="<%= i <= review.rating ? 'text-warning' : 'text-muted' %>">★</span>
+                    <% } %>
+                  </div>
+                </div>
+                <p class="card-text"><%= review.review %></p>
+                <small class="text-muted"><%= review.createdAt.toLocaleDateString() %></small>
+                
+                <% if (currentUser && review.user._id.toString() === currentUser._id.toString()) { %>
+                  <form action="/listings/<%= listing._id %>/reviews/<%= review._id %>?_method=DELETE" method="POST" class="mt-2">
+                    <button type="submit" class="btn btn-sm btn-danger" 
+                      onclick="return confirm('Are you sure you want to delete this review?')">
+                      Delete
+                    </button>
+                  </form>
+                <% } %>
+              </div>
+            </div>
+          <% }) %>
+        <% } else { %>
+          <div class="text-center py-4">
+            <i class="fas fa-star fa-3x text-muted mb-3"></i>
+            <p class="text-muted">No reviews yet. Be the first to leave a review!</p>
+          </div>
+        <% } %>
+      </div>
+    </div>
+  </div>
+  
+  <div class="col-md-4">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">Book this place</h5>
+        <form action="/bookings" method="POST">
+          <input type="hidden" name="listingId" value="<%= listing._id %>">
+          <div class="mb-3">
+            <label for="startDate" class="form-label">Check-in</label>
+            <input type="date" class="form-control" id="startDate" name="startDate" required>
+          </div>
+          <div class="mb-3">
+            <label for="endDate" class="form-label">Check-out</label>
+            <input type="date" class="form-control" id="endDate" name="endDate" required>
+          </div>
+          <button type="submit" class="btn btn-primary w-100">Book Now</button>
+        </form>
+      </div>
+    </div>
+    
+    <% if (currentUser) { %>
+      <div class="mt-3">
+        <a href="/listings/<%= listing._id %>/edit" class="btn btn-warning w-100 mb-2">Edit Listing</a>
+        <form action="/listings/<%= listing._id %>?_method=DELETE" method="POST">
+          <button type="submit" class="btn btn-danger w-100">Delete Listing</button>
+        </form>
+      </div>
+    <% } %>
+  </div>
+</div>
+
+<!-- Add Font Awesome for icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <!-- Google Maps API -->
+<script>
+function initMap() {
+  const listing = <%- JSON.stringify(listing) %>;
+  const location = listing.location + ', ' + listing.country;
+  
+  // Check if Google Maps API is loaded
+  if (typeof google === 'undefined') {
+    document.getElementById('map').innerHTML = '<p class="text-danger">Map service unavailable. Please check your internet connection.</p>';
+    return;
+  }
+  
+  const geocoder = new google.maps.Geocoder();
+  geocoder.geocode({ 'address': location }, function(results, status) {
+    if (status === 'OK') {
+      const map = new google.maps.Map(document.getElementById('map'), {
+        zoom: 15,
+        center: results[0].geometry.location,
+        mapTypeId: 'roadmap'
+      });
+      
+      const marker = new google.maps.Marker({
+        map: map,
+        position: results[0].geometry.location,
+        title: listing.title,
+        animation: google.maps.Animation.DROP
+      });
+      
+      const infoWindow = new google.maps.InfoWindow({
+        content: `
+          <div style="max-width: 200px;">
+            <h6>${listing.title}</h6>
+            <p>${listing.description.substring(0, 100)}...</p>
+            <p><strong>$${listing.price}/night</strong></p>
+          </div>
+        `
+      });
+      
+      marker.addListener('click', function() {
+        infoWindow.open(map, marker);
+      });
+      
+      // Center map on resize
+      google.maps.event.addDomListener(window, 'resize', function() {
+        map.setCenter(results[0].geometry.location);
+      });
+    } else {
+      console.error('Geocode was not successful for the following reason: ' + status);
+      document.getElementById('map').innerHTML = '<p class="text-danger">Unable to load map. Please check the address: ' + location + '</p>';
+    }
+  });
+}
+
+// Star rating functionality
+document.addEventListener('DOMContentLoaded', function() {
+  const stars = document.querySelectorAll('.star-rating');
+  const ratingInput = document.getElementById('rating');
+  
+  stars.forEach(star => {
+    star.addEventListener('click', function() {
+      const rating = this.getAttribute('data-rating');
+      ratingInput.value = rating;
+      
+      // Update visual state
+      stars.forEach(s => {
+        const starRating = parseInt(s.getAttribute('data-rating'));
+        if (starRating <= rating) {
+          s.classList.add('text-warning');
+          s.classList.remove('text-muted');
+        } else {
+          s.classList.add('text-muted');
+          s.classList.remove('text-warning');
+        }
+      });
+    });
+    
+    star.addEventListener('mouseover', function() {
+      const rating = this.getAttribute('data-rating');
+      stars.forEach(s => {
+        const starRating = parseInt(s.getAttribute('data-rating'));
+        if (starRating <= rating) {
+          s.classList.add('text-warning');
+        }
+      });
+    });
+    
+    star.addEventListener('mouseout', function() {
+      const rating = ratingInput.value || 0;
+      stars.forEach(s => {
+        const starRating = parseInt(s.getAttribute('data-rating'));
+        if (starRating <= rating) {
+          s.classList.add('text-warning');
+          s.classList.remove('text-muted');
+        } else {
+          s.classList.add('text-muted');
+          s.classList.remove('text-warning');
+        }
+      });
+    });
+  });
+});
+
+// Review form submission
+document.getElementById('reviewForm')?.addEventListener('submit', function(e) {
+  const rating = document.getElementById('rating').value;
+  if (!rating) {
+    e.preventDefault();
+    alert('Please select a rating');
+  }
+});
+</script>
+
+<script async defer
+  src="https://maps.googleapis.com/maps/api/js?key=<%= googleMapsApiKey %>&callback=initMap">
+</script>
+
+<style>
+.star-rating {
+  font-size: 24px;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.rating-input {
+  display: inline-block;
+  margin-right: 10px;
+}
+
+#map {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+</style>

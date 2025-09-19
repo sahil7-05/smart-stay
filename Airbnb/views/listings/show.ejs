@@ -1,0 +1,137 @@
+<%- layout("layouts/boilerplate") -%>
+<div class="row">
+  <div class="col-md-8">
+    <img src="<%= listing.image.url %>" class="img-fluid rounded mb-4" alt="<%= listing.title %>">
+    <h1><%= listing.title %></h1>
+    <p class="text-muted"><%= listing.location %>, <%= listing.country %></p>
+    
+    <!-- Rating Display -->
+    <% if (listing.averageRating && listing.averageRating > 0) { %>
+      <div class="mb-3">
+        <span class="text-warning">
+          <% for (let i = 1; i <= 5; i++) { %>
+            <span class="<%= i <= listing.averageRating ? 'text-warning' : 'text-muted' %>">★</span>
+          <% } %>
+        </span>
+        <span class="ms-2"><%= listing.averageRating %>/5 (<%= listing.totalReviews %> reviews)</span>
+      </div>
+    <% } %>
+    
+    <p><%= listing.description %></p>
+    
+    <h3>Amenities</h3>
+    <div class="mb-3">
+      <% if (listing.amenities && listing.amenities.length > 0) { %>
+        <% listing.amenities.forEach(amenity => { %>
+          <span class="badge bg-secondary amenity-badge"><%= amenity %></span>
+        <% }) %>
+      <% } else { %>
+        <p>No amenities listed</p>
+      <% } %>
+    </div>
+    
+    <div class="d-flex justify-content-between align-items-center">
+      <span class="price-tag">$<%= listing.price %>/night</span>
+      <span class="badge bg-primary"><%= listing.type %></span>
+    </div>
+
+    <!-- Location & Map Section -->
+    <div class="mt-4">
+      <h3>Location</h3>
+      <p><i class="fas fa-map-marker-alt"></i> <%= listing.location %>, <%= listing.country %></p>
+      <a href="/listings/<%= listing._id %>/map" class="btn btn-outline-primary">
+        <i class="fas fa-map"></i> View on Map
+      </a>
+    </div>
+
+    <!-- Reviews Section -->
+    <div class="mt-5">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3>Reviews</h3>
+        <a href="/listings/<%= listing._id %>/reviews" class="btn btn-primary">
+          <i class="fas fa-star"></i> View All Reviews
+        </a>
+      </div>
+      
+      <!-- Add Review Button -->
+      <% if (currentUser) { %>
+        <a href="/listings/<%= listing._id %>/reviews" class="btn btn-outline-success mb-3">
+          <i class="fas fa-plus"></i> Add Review
+        </a>
+      <% } %>
+      
+      <!-- Recent Reviews Display -->
+      <% if (reviews && reviews.length > 0) { %>
+        <div class="row">
+          <% reviews.slice(0, 3).forEach(review => { %>
+            <div class="col-md-6 mb-3">
+              <div class="card">
+                <div class="card-body">
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h6 class="card-title mb-0"><%= review.user.name %></h6>
+                    <div class="text-warning">
+                      <% for (let i = 1; i <= 5; i++) { %>
+                        <span class="<%= i <= review.rating ? 'text-warning' : 'text-muted' %>">★</span>
+                      <% } %>
+                    </div>
+                  </div>
+                  <p class="card-text"><%= review.review.substring(0, 100) %><%= review.review.length > 100 ? '...' : '' %></p>
+                  <small class="text-muted"><%= review.createdAt.toLocaleDateString() %></small>
+                </div>
+              </div>
+            </div>
+          <% }) %>
+        </div>
+        <% if (reviews.length > 3) { %>
+          <div class="text-center mt-3">
+            <a href="/listings/<%= listing._id %>/reviews" class="btn btn-outline-primary">
+              View All <%= reviews.length %> Reviews
+            </a>
+          </div>
+        <% } %>
+      <% } else { %>
+        <div class="text-center py-4">
+          <i class="fas fa-star fa-3x text-muted mb-3"></i>
+          <p class="text-muted">No reviews yet. Be the first to leave a review!</p>
+          <% if (currentUser) { %>
+            <a href="/listings/<%= listing._id %>/reviews" class="btn btn-primary">
+              <i class="fas fa-plus"></i> Add Review
+            </a>
+          <% } %>
+        </div>
+      <% } %>
+    </div>
+  </div>
+  
+  <div class="col-md-4">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">Book this place</h5>
+        <form action="/bookings" method="POST">
+          <input type="hidden" name="listingId" value="<%= listing._id %>">
+          <div class="mb-3">
+            <label for="startDate" class="form-label">Check-in</label>
+            <input type="date" class="form-control" id="startDate" name="startDate" required>
+          </div>
+          <div class="mb-3">
+            <label for="endDate" class="form-label">Check-out</label>
+            <input type="date" class="form-control" id="endDate" name="endDate" required>
+          </div>
+          <button type="submit" class="btn btn-primary w-100">Book Now</button>
+        </form>
+      </div>
+    </div>
+    
+    <% if (currentUser) { %>
+      <div class="mt-3">
+        <a href="/listings/<%= listing._id %>/edit" class="btn btn-warning w-100 mb-2">Edit Listing</a>
+        <form action="/listings/<%= listing._id %>?_method=DELETE" method="POST">
+          <button type="submit" class="btn btn-danger w-100">Delete Listing</button>
+        </form>
+      </div>
+    <% } %>
+  </div>
+</div>
+
+<!-- Add Font Awesome for icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">

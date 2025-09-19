@@ -1,0 +1,55 @@
+<%- layout("layouts/boilerplate") -%>
+<div class="row">
+  <div class="col-md-8 offset-md-2">
+    <h1 class="mb-4">Edit Listing</h1>
+    <form action="/listings/<%= listing._id %>" method="POST" enctype="multipart/form-data" novalidate>
+      <div class="row">
+        <div class="col-md-6">
+          <div class="mb-3">
+            <label for="title" class="form-label">Title</label>
+            <input type="text" class="form-control" id="title" name="listing[title]" value="<%= listing.title %>" required>
+          </div>
+          <div class="mb-3">
+            <label for="description" class="form-label">Description</label>
+            <textarea class="form-control" id="description" name="listing[description]" rows="3" required><%= listing.description %></textarea>
+          </div>
+          <div class="mb-3">
+            <label for="price" class="form-label">Price</label>
+            <input type="number" class="form-control" id="price" name="listing[price]" value="<%= listing.price %>" required>
+          </div>
+          <div class="mb-3">
+            <label for="location" class="form-label">Location</label>
+            <input type="text" class="form-control" id="location" name="listing[location]" value="<%= listing.location %>" required>
+          </div>
+          <div class="mb-3">
+            <label for="country" class="form-label">Country</label>
+            <input type="text" class="form-control" id="country" name="listing[country]" value="<%= listing.country %>" required>
+          </div>
+          <div class="mb-3">
+            <label for="type" class="form-label">Type</label>
+            <select class="form-select" id="type" name="listing[type]" required>
+              <option value="stay" <%= listing.type === 'stay' ? 'selected' : '' %>>Stay</option>
+              <option value="experience" <%= listing.type === 'experience' ? 'selected' : '' %>>Experience</option>
+              <option value="restaurant" <%= listing.type === 'restaurant' ? 'selected' : '' %>>Restaurant</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="amenities" class="form-label">Amenities</label>
+            <input type="text" class="form-control" id="amenities" name="listing[amenities]" value="<%= listing.amenities.join(', ') %>">
+          </div>
+          <div class="mb-3">
+            <label for="image" class="form-label">Image</label>
+            <input type="file" class="form-control" id="image" name="image" accept="image/*">
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="mb-3">
+            <label for="description" class="form-label">Description</label>
+            <textarea class="form-control" id="description" name="listing[description]" rows="5" required><%= listing.description %></textarea>
+          </div>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary w-100">Update Listing</button>
+    </form>
+  </div>
+</div>

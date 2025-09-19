@@ -1,0 +1,37 @@
+<%- layout("layouts/boilerplate") -%>
+<div class="row">
+  <div class="col-12">
+    <h1 class="mb-4">My Bookings</h1>
+    
+    <% if (bookings.length === 0) { %>
+      <div class="text-center">
+        <h3>No bookings yet</h3>
+        <p><a href="/listings">Browse listings</a> to make your first booking!</p>
+      </div>
+    <% } else { %>
+      <div class="row">
+        <% for (let booking of bookings) { %>
+          <div class="col-md-4 mb-4">
+            <div class="card">
+              <img src="<%= booking.listing.image.url %>" class="card-img-top" alt="<%= booking.listing.title %>">
+              <div class="card-body">
+                <h5 class="card-title"><%= booking.listing.title %></h5>
+                <p class="card-text">
+                  <small class="text-muted"><%= booking.listing.location %></small>
+                </p>
+                <p class="card-text">
+                  <strong>Check-in:</strong> <%= booking.startDate.toDateString() %><br>
+                  <strong>Check-out:</strong> <%= booking.endDate.toDateString() %><br>
+                  <strong>Total:</strong> $<%= booking.totalPrice %>
+                </p>
+                <span class="badge <%= booking.status === 'pending' ? 'bg-warning' : booking.status === 'confirmed' ? 'bg-success' : 'bg-danger' %>">
+                  <%= booking.status %>
+                </span>
+              </div>
+            </div>
+          </div>
+        <% } %>
+      </div>
+    <% } %>
+  </div>
+</div>

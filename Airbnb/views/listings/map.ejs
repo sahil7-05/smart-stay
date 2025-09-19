@@ -1,0 +1,61 @@
+<% layout("layouts/boilerplate") -%>
+<div class="row">
+  <div class="col-12">
+    <h1 class="mb-4">Location: <%= listing.title %></h1>
+    
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title"><%= listing.location %>, <%= listing.country %></h5>
+        <p class="card-text"><%= listing.description %></p>
+        
+        <div id="map" style="height: 400px; width: 100%;" class="mb-3"></div>
+        
+        <a href="/listings/<%= listing._id %>" class="btn btn-primary">Back to Listing</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function initMap() {
+  const listing = <%- JSON.stringify(listing) %>;
+  const location = listing.location + ', ' + listing.country;
+  
+  const geocoder = new google.maps.Geocoder();
+  geocoder.geocode({ 'address': location }, function(results, status) {
+    if (status === 'OK') {
+      const map = new google.maps.Map(document.getElementById('map'), {
+        zoom: 15,
+        center: results[0].geometry.location
+      });
+      
+      const marker = new google.maps.Marker({
+        map: map,
+        position: results[0].geometry.location,
+        title: listing.title
+      });
+      
+      const infoWindow = new google.maps.InfoWindow({
+        content: `
+          <div>
+            <h6>${listing.title}</h6>
+            <p>${listing.description.substring(0, 100)}...</p>
+            <p><strong>$${listing.price}/night</strong></p>
+          </div>
+        `
+      });
+      
+      marker.addListener('click', function() {
+        infoWindow.open(map, marker);
+      });
+    } else {
+      console.error('Geocode was not successful for the following reason: ' + status);
+      document.getElementById('map').innerHTML = '<p class="text-danger">Unable to load map. Please check the address.</p>';
+    }
+  });
+}
+</script>
+
+<script async defer
+  src="https://maps.googleapis.com/maps/api/js?key=<%= googleMapsApiKey %>&callback=initMap">
+</script>
